@@ -1,0 +1,138 @@
+body {
+    background-color: #f0f0f0;
+    font-family: Helvetica, sans-serif, sans-serif;
+    border-radius: 10%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    width: 100vw;
+    justify-content: center;
+
+}
+
+wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10vh;
+    
+}
+
+header,
+main,
+footer,
+.Tierbild {
+    width: 25vw;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+header {
+    background-color: #96714b;
+    display: flex;
+    justify-content: flex-start;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+main {
+    background-color: #ddbd97;
+    height: 20vh;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: left;
+}
+
+footer {
+    background-color: #96714b;
+    height: 3em;
+    display: flex;
+    justify-content: center;
+    border-radius: 0 0 3em 3em;
+    box-shadow: 0px -4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+h1 {
+    display:flex;
+    font-size: 1.5em;
+    text-transform: uppercase;
+    color: #4e3714;
+    margin-block-start: .5em;
+    margin-block-end: .5em;
+    padding-left: .5em;
+    padding-right: .5em;
+    align-self: center;
+}
+
+div{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+p{
+    display:flex;
+}
+
+.Tierbild {
+    height: 20em; /* Höhe des Bildes */
+    object-fit: cover; /* Bild wird zugeschnitten, um den Container zu füllen */
+    object-position: 50% 75%; /* Bild wird zentriert */
+    border-radius: 3em 3em 0 0; /* Abgerundete Ecken */
+}
+
+.Kategorie {
+    box-sizing: border-box;
+    font-size: 1.2em;
+    color: #4e3714;
+    padding-block-start: .5em;
+    padding-block-end: .5em;
+    padding-left: 1.5em;
+    padding-right: .5em;
+    justify-content: flex-start;
+    
+}
+
+#group {
+    font-size: 1.7em;
+    font-weight: 800;
+    color: #4e3714;
+    background-color: #ff8c00;
+    padding-left: 1.5em;
+    min-width: 3em;
+}
+
+
+#trivia {
+    font-family:'Helvetica', sans-serif;   
+    font-size: 0.85em;
+    font-weight: 600;
+    font-stretch: condensed;
+    color: #e8b480;
+}
+
+.Icon{
+    width: 30px;
+    height: 30px;
+    display: block; /* Stellt sicher, dass das Icon als Block-Element behandelt wird */
+    object-fit: cover;
+    align-self: left;
+    /* transform: rotate(90deg); */
+}
+#sizeIcon{
+    transform: rotate(90deg);
+}
+#speedIcon{
+    transform: scale(1.5);
+}
+
+.iconBox{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 0.5px solid #926828;
+    flex-basis: 49.5%;
+}

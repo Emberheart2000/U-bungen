@@ -1,0 +1,13 @@
+@media screen and (max-width: 600px) {
+  /* Styles */
+main,ul{
+    
+    flex-direction: column;
+}
+main{
+    min-height:70vh;
+}
+ul{
+    min-height:20vh;
+}
+}

@@ -1,0 +1,11 @@
+@media screen and (max-width: 1200px) {
+    header, main, footer, .Tierbild {
+        width: 55vw;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    header, main, footer, .Tierbild {
+        width: 90vw;
+    }
+}

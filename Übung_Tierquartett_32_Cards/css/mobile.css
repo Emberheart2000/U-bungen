@@ -1,0 +1,17 @@
+@media screen and (max-width: 1200px) {
+    .header, main, .trivia, .Tierbild {
+        width: 45vw;
+    }
+    #wrapper-container{
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .header, main, .trivia, .Tierbild {
+        width: 90vw;
+    }
+    #wrapper-container{
+        grid-template-columns: 1fr;
+    }
+}
