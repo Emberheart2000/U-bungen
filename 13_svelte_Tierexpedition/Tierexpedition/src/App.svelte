@@ -4,9 +4,8 @@
     import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
     import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
     import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
-  import { add, rotate } from 'three/tsl';
 
-    let scene, camera, renderer, controls;
+    let scene, camera, renderer, controls, particleSystem;
     let floor, model;
     let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
 
@@ -48,6 +47,9 @@
         // Initiale Textur und Modell laden
         loadFloorTexture('desert.jpg');
         loadModel('/scorpion/scene.gltf', 0.003);
+
+        // Staubpartikel hinzufügen
+        addDustParticles();
 
         //Mehrere Planes mit PNG-Texturen hinzufügen
         // addRandomPlanes(10, 'Stein.svg', 2.5);
@@ -181,6 +183,30 @@
         }
     }
 
+    function addDustParticles() {
+        const particleCount = 100;
+        const particles = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = Math.random() * 200 - 100; // x-Position
+            positions[i * 3 + 1] = Math.random() * 50; // y-Position
+            positions[i * 3 + 2] = Math.random() * 200 - 100; // z-Position
+        }
+
+        particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        const particleMaterial = new THREE.PointsMaterial({
+            color: 0xC2B280,
+            size: 0.3,
+            transparent: true,
+            opacity: 0.5
+        });
+
+        particleSystem = new THREE.Points(particles, particleMaterial);
+        scene.add(particleSystem);
+    }
+
     // Animationsschleife
     function animate() {
         requestAnimationFrame(animate);
@@ -190,6 +216,18 @@
         if (moveBackward) camera.position.z += step;
         if (moveLeft) camera.position.x -= step;
         if (moveRight) camera.position.x += step;
+
+        // Partikelbewegung aktualisieren
+        const positions = particleSystem.geometry.attributes.position.array;
+        for (let i = 0; i < positions.length; i += 3) {
+            positions[i + 1] -= 0.1; // y-Position verringern (Staub fällt nach unten)
+            positions[i] += Math.random() * 0.5 - 0.1; // x-Position zufällig ändern
+            if (positions[i + 1] < 0 || positions[i] > 100) {
+                positions[i + 1] = 50; // Partikel zurück nach oben setzen, wenn sie den Boden erreichen
+                positions[i] = Math.random() * 200 - 100; // x-Position zufällig setzen
+            }
+        }
+        particleSystem.geometry.attributes.position.needsUpdate = true;
 
         controls.update(); // Dämpfung anwenden
         renderer.render(scene, camera);
