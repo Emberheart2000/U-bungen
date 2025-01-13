@@ -4,12 +4,9 @@
     import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
     import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
     import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
-    import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-    import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
-    import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
-    import { add, rotate } from 'three/tsl';
+  import { add, rotate } from 'three/tsl';
 
-    let scene, camera, renderer, controls, composer;
+    let scene, camera, renderer, controls;
     let floor, model;
     let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
 
@@ -66,14 +63,6 @@
         loadSVG(10, 'acazia.svg',0.1, 100,13.5,50);
         loadSVG(10, 'bush.svg', 0.04, 100,5.5,50);
         loadSVG(10, 'cactus.svg', 0.03, 100,2.6,50);
-
-        // Postprocessing
-        composer = new EffectComposer(renderer);
-        const renderPass = new RenderPass(scene, camera);
-        composer.addPass(renderPass);
-
-        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-        composer.addPass(bloomPass);
 
         animate();
     }
@@ -203,7 +192,7 @@
         if (moveRight) camera.position.x += step;
 
         controls.update(); // Dämpfung anwenden
-        composer.render(); // Postprocessing anwenden
+        renderer.render(scene, camera);
     }
 
     // Initialisierung beim Laden der Komponente
