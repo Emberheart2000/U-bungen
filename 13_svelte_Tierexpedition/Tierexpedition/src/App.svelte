@@ -46,7 +46,7 @@
 
         // Initiale Textur und Modell laden
         loadFloorTexture('desert.jpg');
-        loadModel('/scorpion/scene.gltf', 0.003);
+        loadModel('/scorpion/scene.gltf', 0.003, 0, 0, 0);
 
         // Staubpartikel hinzufügen
         addDustParticles();
@@ -65,6 +65,7 @@
         loadSVG(10, 'acazia.svg',0.1, 100,13.5,50);
         loadSVG(10, 'bush.svg', 0.04, 100,5.5,50);
         loadSVG(10, 'cactus.svg', 0.03, 100,2.6,50);
+        loadSVG(1, 'termites.svg', 0.03, 0,2.8,10);
 
         animate();
     }
@@ -95,7 +96,7 @@
         scene.add(floor);
     }
 
-    function loadModel(modelPath, scale=1) {
+    function loadModel(modelPath, scale=1, posx=0, posy=0, posz=0) {
         const loader = new GLTFLoader();
         loader.load(
             modelPath, // Pfad zu Ihrem 3D-Modell
@@ -104,7 +105,7 @@
                     scene.remove(model);
                 }
                 model = gltf.scene;
-                model.position.set(0, 0, 0); // Setzen Sie die Position des Modells
+                model.position.set(posx, posy, posz); // Setzen Sie die Position des Modells
                 model.scale.set(scale, scale, scale); // Skalierung des Modells
                 scene.add(model);
                 console.log('Modell erfolgreich geladen');
