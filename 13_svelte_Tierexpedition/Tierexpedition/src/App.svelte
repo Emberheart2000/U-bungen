@@ -2,8 +2,15 @@
     import { onMount } from 'svelte';
     import * as THREE from 'three';
     import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+    import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+    import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
+    import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+    import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+    import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
+    import { add, rotate } from 'three/tsl';
 
-    let scene, camera, renderer, controls;
+    let scene, camera, renderer, controls, composer;
+    let floor, model;
     let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
 
     function init() {
@@ -14,36 +21,72 @@
         document.body.appendChild(renderer.domElement);
 
         controls = new OrbitControls(camera, renderer.domElement);
-        controls.enablePan = false; // Deaktiviert das Panning mit der Maus
-        controls.enableRotate = false; // Deaktiviert das Rotieren mit der Maus
-        controls.enableZoom = true; // Zoom mit der Maus erlauben
-        //controls.target.set(0, 0, 0); // Setzt das Ziel der Kamera auf den Ursprung
-        camera.position.set(0, 5, 5); // Kamera leicht über dem Boden positionieren
-        camera.lookAt(camera.position.x+10, 0, 0); // Kamera auf den Ursprung ausrichten
+        controls.enableDamping = true; // Sanfte Bewegungen
+        controls.enablePan = false; // Deaktiviert das Verschieben der Kamera
+        controls.enableZoom = true; // Zoom bleibt aktiv
+        controls.minDistance = 1; // Mindestabstand beim Zoomen
+        controls.maxDistance = 100; // Maximaler Abstand beim Zoomen
         controls.update();
 
-        // Beispiel: Einfache Box hinzufügen
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
+        camera.position.set(0, 5, 5); // Kamera leicht über dem Boden positionieren
+        camera.lookAt(0, 0, 0); // Kamera auf den Ursprung ausrichten
 
-        // Zielobjekt hinzufügen
-        const targetGeometry = new THREE.BoxGeometry(1, 1, 1);
-        const targetMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        const targetCube = new THREE.Mesh(targetGeometry, targetMaterial);
-        targetCube.position.set(0, 0, 0); // Position des Zielobjekts
-        scene.add(targetCube);
+        // Hintergrundfarbe setzen
+        renderer.setClearColor(0x87ceeb); // Himmelblau
 
-        // Boden hinzufügen
-        const floorGeometry = new THREE.PlaneGeometry(100, 100);
+        // Hintergrundtextur laden
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load('desert_sky2.jpg', (texture) => {
+            scene.background = texture;
+        });
+
+        // Lichtquellen hinzufügen
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Weiches Umgebungslicht
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Richtungslicht
+        directionalLight.position.set(5, 10, 7.5);
+        scene.add(directionalLight);
+
+        // Initiale Textur und Modell laden
+        loadFloorTexture('desert.jpg');
+        loadModel('/scorpion/scene.gltf', 0.003);
+
+        //Mehrere Planes mit PNG-Texturen hinzufügen
+        // addRandomPlanes(10, 'Stein.svg', 2.5);
+        // addRandomPlanes(5, 'termites.svg');
+        // addRandomPlanes(10, 'bush.png', 10);
+        // addRandomPlanes(10, 'tree.png', 25);
+        // addRandomPlanes(15, 'cactus.png', 6);
+        //addRandomPlanes(30, 'pyramid.png', 10);
+
+        // SVG-Illustrationen laden und zur Szene hinzufügen
+        //loadSVG(5, 'pyramid.svg', 0.05, 100,4,50);
+        loadSVG(10, 'stone.svg', 0.03, 100,3,50);
+        loadSVG(10, 'acazia.svg',0.1, 100,13.5,50);
+        loadSVG(10, 'bush.svg', 0.04, 100,5.5,50);
+        loadSVG(10, 'cactus.svg', 0.03, 100,2.6,50);
+
+        // Postprocessing
+        composer = new EffectComposer(renderer);
+        const renderPass = new RenderPass(scene, camera);
+        composer.addPass(renderPass);
+
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        composer.addPass(bloomPass);
+
+        animate();
+    }
+
+    function loadFloorTexture(texturePath, texturescale = 3) {
+        const floorGeometry = new THREE.PlaneGeometry(200, 100);
         const textureLoader = new THREE.TextureLoader();
         const floorTexture = textureLoader.load(
-            'ground.jpg', // Relativer Pfad zur Textur
+            texturePath, // Pfad zur Textur
             (texture) => {
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
-                texture.repeat.set(3, 3); // Skalierung der Textur anpassen
+                texture.repeat.set(texturescale, texturescale); // Skalierung der Textur anpassen
                 console.log('Textur erfolgreich geladen');
             },
             undefined,
@@ -52,12 +95,101 @@
             }
         );
         const floorMaterial = new THREE.MeshBasicMaterial({ map: floorTexture, side: THREE.DoubleSide });
-        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        if (floor) {
+            scene.remove(floor);
+        }
+        floor = new THREE.Mesh(floorGeometry, floorMaterial);
         floor.rotation.x = Math.PI / 2; // Boden horizontal ausrichten
         floor.position.y = 0; // Boden auf y=0 setzen
         scene.add(floor);
+    }
 
-        animate();
+    function loadModel(modelPath, scale=1) {
+        const loader = new GLTFLoader();
+        loader.load(
+            modelPath, // Pfad zu Ihrem 3D-Modell
+            (gltf) => {
+                if (model) {
+                    scene.remove(model);
+                }
+                model = gltf.scene;
+                model.position.set(0, 0, 0); // Setzen Sie die Position des Modells
+                model.scale.set(scale, scale, scale); // Skalierung des Modells
+                scene.add(model);
+                console.log('Modell erfolgreich geladen');
+            },
+            undefined,
+            (error) => {
+                console.error('Fehler beim Laden des Modells:', error);
+            }
+        );
+    }
+
+    function addRandomPlanes(count=10, texturePath, scale = 5) {
+        const textureLoader = new THREE.TextureLoader();
+        const texture = textureLoader.load(texturePath);
+
+        for (let i = 0; i < count; i++) {
+            const planeGeometry = new THREE.PlaneGeometry(1, 1);
+            const planeMaterial = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, transparent: true });
+            const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            plane.scale.set(scale, scale, scale); // Skalierung des Planes
+            // Zufällige Position setzen
+            plane.position.set(
+                Math.random() * 100-50, // x-Position zwischen -10 und 10
+                0,     // y-Position zwischen 0 und 5
+                Math.random() * 50  // z-Position zwischen -10 und 10
+            );
+
+            // Zufällige Rotation setzen
+            plane.rotation.set(
+                0, // x-Rotation
+                THREE.MathUtils.degToRad(Math.random() * 20), // y-Rotation
+                0  // z-Rotation
+            );
+
+            scene.add(plane);
+        }
+    }
+
+    function loadSVG(count, svgPath, scale=0.03, posx=100, posy=3, posz=100) {
+        for (let i = 0; i < count; i++) {
+        const loader = new SVGLoader();
+        loader.load(
+            svgPath,
+            (data) => {
+                const paths = data.paths;
+                const group = new THREE.Group();
+
+                paths.forEach((path) => {
+                    const material = new THREE.MeshBasicMaterial({
+                        color: path.color,
+                        side: THREE.DoubleSide,
+                        depthWrite: false,
+                        transparent: true,
+                        opacity: 1.0,
+                    });
+
+                    const shapes = SVGLoader.createShapes(path);
+                    shapes.forEach((shape) => {
+                        const geometry = new THREE.ShapeGeometry(shape);
+                        const mesh = new THREE.Mesh(geometry, material);
+                        group.add(mesh);
+                    });
+                });
+
+                group.position.set(Math.random()*posx-posx/2, posy, Math.random()*posz); // Setzen Sie die Position der Gruppe
+                group.scale.set(scale, scale, scale); // Skalierung der Gruppe
+                group.rotation.set(0, 0, Math.PI); // Rotation der Gruppe
+                scene.add(group);
+                console.log('SVG erfolgreich geladen');
+            },
+            undefined,
+            (error) => {
+                console.error('Fehler beim Laden der SVG:', error);
+            }
+        );
+        }
     }
 
     // Animationsschleife
@@ -70,12 +202,8 @@
         if (moveLeft) camera.position.x -= step;
         if (moveRight) camera.position.x += step;
 
-        // Konsolenausgabe zur Überprüfung der Kameraausrichtung
-        console.log(`Camera Position: x=${camera.position.x}, y=${camera.position.y}, z=${camera.position.z}`);
-        console.log(`Camera LookAt: x=0, y=0, z=0`);
-
-        controls.update();
-        renderer.render(scene, camera);
+        controls.update(); // Dämpfung anwenden
+        composer.render(); // Postprocessing anwenden
     }
 
     // Initialisierung beim Laden der Komponente
@@ -126,4 +254,6 @@
 
 <main>
     <!-- Hier wird die 3D-Szene gerendert -->
+    <button on:click={() => loadFloorTexture('rainforest.jpg',10)}>Neue Bodentextur laden</button>
+    <button on:click={() => loadModel('poison_frog.glb',0.05)}>Neues Modell laden</button>
 </main>
