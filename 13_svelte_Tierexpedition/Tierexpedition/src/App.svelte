@@ -1,11 +1,18 @@
 <script>
+    import { Router } from 'svelte-spa-router';
+    import Home from './pages/Home.svelte';
+    import About from './pages/About.svelte';
+    import NotFound from './pages/NotFound.svelte';
+    import Game from './pages/Game.svelte';
+
     import { onMount } from 'svelte';
     import * as THREE from 'three';
     import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
     import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
     import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
+    
 
-    let scene, camera, renderer, controls, particleSystem;
+    let scene, camera, renderer, controls, particleSystem, raycaster, mouse;
     let floor, model;
     let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
 
@@ -44,6 +51,10 @@
         directionalLight.position.set(5, 10, 7.5);
         scene.add(directionalLight);
 
+        // Raycaster und Maus
+        raycaster = new THREE.Raycaster();
+        mouse = new THREE.Vector2();
+
         // Initiale Textur und Modell laden
         loadFloorTexture('desert.jpg');
         loadModel('/scorpion/scene.gltf', 0.003, 0, 0, 0);
@@ -57,7 +68,7 @@
         // addRandomPlanes(10, 'bush.png', 10);
         // addRandomPlanes(10, 'tree.png', 25);
         // addRandomPlanes(15, 'cactus.png', 6);
-        //addRandomPlanes(30, 'pyramid.png', 10);
+        // addRandomPlanes(30, 'pyramid.png', 10);
 
         // SVG-Illustrationen laden und zur Szene hinzufügen
         //loadSVG(5, 'pyramid.svg', 0.05, 100,4,50);
@@ -208,6 +219,22 @@
         scene.add(particleSystem);
     }
 
+    function onMouseClick(event) {
+        // Mausposition normalisieren
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        // Raycaster aktualisieren
+        raycaster.setFromCamera(mouse, camera);
+
+        // Überprüfen, ob der Skorpion getroffen wurde
+        const intersects = raycaster.intersectObject(model, true);
+        if (intersects.length > 0) {
+            console.log('Skorpion angeklickt!');
+            // Hier können Sie weitere Aktionen ausführen, wenn der Skorpion angeklickt wird
+        }
+    }
+
     // Animationsschleife
     function animate() {
         requestAnimationFrame(animate);
@@ -277,6 +304,9 @@
                     break;
             }
         });
+
+        // Mausklick-Event hinzufügen
+        document.addEventListener('click', onMouseClick);
     });
 </script>
 
@@ -285,3 +315,9 @@
     <button on:click={() => loadFloorTexture('rainforest.jpg',10)}>Neue Bodentextur laden</button>
     <button on:click={() => loadModel('poison_frog.glb',0.05)}>Neues Modell laden</button>
 </main>
+
+<Router>
+    <Home path="/" />
+    <About path="/about" />
+    <Animals path="/animals" />
+  </Router>
