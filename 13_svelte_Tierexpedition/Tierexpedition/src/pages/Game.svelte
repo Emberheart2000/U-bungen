@@ -1,5 +1,5 @@
 <script>
-import { onMount } from 'svelte';
+import { onMount, onDestroy } from 'svelte';
     import * as THREE from 'three';
     import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
     import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -225,7 +225,8 @@ import { onMount } from 'svelte';
         const intersects = raycaster.intersectObject(model, true);
         if (intersects.length > 0) {
             console.log('Skorpion angeklickt!');
-            // Hier können Sie weitere Aktionen ausführen, wenn der Skorpion angeklickt wird
+            // Aktionen ausführen, wenn der Skorpion angeklickt wird
+            window.location.hash = '#/';
         }
     }
 
@@ -302,10 +303,25 @@ import { onMount } from 'svelte';
         // Mausklick-Event hinzufügen
         document.addEventListener('click', onMouseClick);
     });
+
+    onDestroy(() => {
+        // Entfernen Sie den Renderer und alle Event-Listener
+        renderer.dispose();
+        document.body.removeChild(renderer.domElement);
+        window.removeEventListener('resize', onWindowResize);
+    });
+
+    function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    window.addEventListener('resize', onWindowResize);
 </script>
 
 <main>
-    <!-- Hier wird die 3D-Szene gerendert -->
-    <button on:click={() => loadFloorTexture('rainforest.jpg',10)}>Neue Bodentextur laden</button>
-    <button on:click={() => loadModel('poison_frog.glb',0.05)}>Neues Modell laden</button>
+    <button class="button"on:click={() => loadFloorTexture('rainforest.jpg',10)}>Neue Bodentextur laden</button>
+    <button class="button"on:click={() => loadModel('poison_frog.glb',0.05)}>Neues Modell laden</button>
 </main>
+
