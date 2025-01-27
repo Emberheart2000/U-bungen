@@ -53,4 +53,56 @@
     width: 100%;
     height: auto;
   }
+
+  .subtext {
+    margin-top: 5rem;
+    font-size: 5rem;
+    font-weight: bold;
+}
+
+.description {
+    margin-top: 5rem;
+    max-width: 35%;
+    font-size: 5rem;
+    min-width: 50%;
+}
+
+/* Stile für Handys */
+@media (max-width: 600px) {
+    .searchbutton {
+        max-width: 80%;
+        min-width: 70%;
+        font-size: 3rem;
+    }
+    .description {
+      min-width: 80%;
+    }
+  
+}
+
+/* Stile für Tablets */
+@media (min-width: 601px) and (max-width: 1200px) {
+    .searchbutton {
+        max-width: 50%;
+        min-width: 40%;
+        font-size: 4rem;
+    }
+    .description {
+      min-width: 60%;
+    }
+}
+
+/* Stile für Desktops */
+@media (min-width: 1200px) {
+    .searchbutton {
+        max-width: 30%;
+        min-width: 25%;
+        font-size: 5rem;
+    }
+    .description {
+      min-width: 40%;
+    }
+}
 </style>
+
+

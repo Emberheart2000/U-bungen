@@ -9,7 +9,7 @@
     "/": LandingPage,
     "/reserve": ReserveOverview,
     "/animalquartett": AnimalQuartett,
-  };
+  }
 </script>
 
 <header>

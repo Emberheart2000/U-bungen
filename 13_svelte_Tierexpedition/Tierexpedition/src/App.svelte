@@ -4,11 +4,13 @@
   import About from "./pages/About.svelte";
   import Game from "./pages/Game.svelte";
   import Cards from "./pages/Cards.svelte";
+  import Tierquartett from "./pages/Tierquartett.svelte";
 
   const routes = {
     "/": Home,
     "/about": About,
     "/game": Game,
+    "/quartett": Tierquartett,
     "/cards": Cards,
   };
 
@@ -35,7 +37,7 @@
       <li><a href="#/quartett">Quartett</a></li>
       <li><a href="#/cards">Cards</a></li>
       <li><button class="button" on:click={() => window.location.href = '#/game'}>Explore</button></li>
-      <!-- <li>
+            <!-- <li>
         <button class="button" on:click={() => fetchAnimalExcerpt("Scorpion")}
           >Cheetah</button>
       </li> -->
