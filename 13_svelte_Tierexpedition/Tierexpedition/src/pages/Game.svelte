@@ -166,14 +166,14 @@
 
           centerSVG(group);
 
-          group.position.set(
-            Math.random() * posx - posx / 2,
-            posy,
-            Math.random() * posz - posz / 2
-          ); // Setzen Sie die Position der Gruppe
-          group.scale.set(scale, scale, scale); // Skalierung der Gruppe
-          group.rotation.set(0, 0, Math.PI); // Rotation der Gruppe
-          scene.add(group);
+          // group.position.set(
+          //   Math.random() * posx - posx / 2,
+          //   posy,
+          //   Math.random() * posz - posz / 2
+          // ); // Setzen Sie die Position der Gruppe
+          // group.scale.set(scale, scale, scale); // Skalierung der Gruppe
+          // group.rotation.set(0, 0, Math.PI); // Rotation der Gruppe
+          // scene.add(group);
           GroupArray.push(group);
           console.log("SVG erfolgreich geladen");
         },
@@ -355,6 +355,7 @@
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   }
+
   function changeHints() {
     const overlay = document.getElementById("overlay");
     overlay.innerHTML =
@@ -390,6 +391,7 @@
       Hinweis: Verwenden Sie die WASD-Tasten, um sich zu bewegen. Mit q und e
       können Sie sich drehen
     </p>
+    <button class="button" on:click={changeHints}>Hinweise anzeigen</button>
   </div>
 </main>
 

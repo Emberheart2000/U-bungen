@@ -5,6 +5,7 @@
   import Game from "./pages/Game.svelte";
   import Cards from "./pages/Cards.svelte";
   import Tierquartett from "./pages/Tierquartett.svelte";
+  import { fetchAnimalExcerpt } from "./js/functions";
 
   const routes = {
     "/": Home,
@@ -14,16 +15,7 @@
     "/cards": Cards,
   };
 
-  let animalExcerpt = "";
-
-  async function fetchAnimalExcerpt(animal) {
-    const response = await fetch(
-      `https://en.wikipedia.org/api/rest_v1/page/summary/${animal}`
-    );
-    const data = await response.json();
-    animalExcerpt = data.extract;
-    alert(animalExcerpt);
-  }
+  // let animalExcerpt = "";
 </script>
 
 <nav>
@@ -37,10 +29,15 @@
       <li><a href="#/quartett">Quartett</a></li>
       <li><a href="#/cards">Cards</a></li>
       <li><button class="button" on:click={() => window.location.href = '#/game'}>Explore</button></li>
-            <!-- <li>
-        <button class="button" on:click={() => fetchAnimalExcerpt("Scorpion")}
+            <li>
+        <button class="button" on:click={async () => {
+          const data = await fetchAnimalExcerpt("Cheetah")
+          console.log(data);
+          alert(data.extract);
+          // animalExcerpt = data.extract;
+          }}
           >Cheetah</button>
-      </li> -->
+      </li>
     </ul>
   </header>
 </nav>
